@@ -373,8 +373,9 @@ class QuantizationAwareModule(nn.Module):
             self.adjust_output_shift = nn.Parameter(torch.Tensor([not dev.simulate]),
                                                     requires_grad=False)
         else:
-            assert f'Undefined mode with weight_bits: {weight_bits}, bias_bits: {bias_bits}, ' \
-                   f'quantize_activation: {quantize_activation}'
+            assert False, f'Undefined mode with weight_bits: {weight_bits}, ' \
+                          f'bias_bits: {bias_bits}, ' \
+                          f'quantize_activation: {quantize_activation}'
 
         self.set_functions()
 
