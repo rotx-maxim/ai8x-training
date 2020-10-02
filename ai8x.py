@@ -244,9 +244,9 @@ def quantize_clamp_parameters(bits):
     """
     Return new Quantization and Clamp objects for parameter
     """
-    if dev.simulate or (bits==0):
+    if dev.simulate or (bits == 0):
         clamp = Empty()
-        if bits!=0:
+        if bits != 0:
             quantize = Quantize(num_bits=bits-dev.DATA_BITS+1)
         else:
             quantize = Empty()
@@ -360,16 +360,18 @@ class QuantizationAwareModule(nn.Module):
         self.init_module(weight_bits, bias_bits, quantize_activation)
 
     def init_module(self, weight_bits, bias_bits, quantize_activation):
-        if (weight_bits == None) and (bias_bits == None) and (quantize_activation == False):
+        """Initialize model parameters"""
+        if (weight_bits is None) and (bias_bits is None) and (not quantize_activation):
             self.weight_bits = nn.Parameter(torch.Tensor([0]), requires_grad=False)
             self.bias_bits = nn.Parameter(torch.Tensor([0]), requires_grad=False)
             self.quantize_activation = nn.Parameter(torch.Tensor([False]), requires_grad=False)
             self.adjust_output_shift = nn.Parameter(torch.Tensor([False]), requires_grad=False)
-        elif (weight_bits in [1, 2, 4, 8]) and (bias_bits == 8) and (quantize_activation == True):
+        elif (weight_bits in [1, 2, 4, 8]) and (bias_bits == 8) and quantize_activation:
             self.weight_bits = nn.Parameter(torch.Tensor([weight_bits]), requires_grad=False)
             self.bias_bits = nn.Parameter(torch.Tensor([bias_bits]), requires_grad=False)
             self.quantize_activation = nn.Parameter(torch.Tensor([True]), requires_grad=False)
-            self.adjust_output_shift = nn.Parameter(torch.Tensor([not dev.simulate]), requires_grad=False)
+            self.adjust_output_shift = nn.Parameter(torch.Tensor([not dev.simulate]),
+                                                    requires_grad=False)
         else:
             assert f'Undefined mode with weight_bits: {weight_bits}, bias_bits: {bias_bits}, ' \
                    f'quantize_activation: {quantize_activation}'
@@ -377,19 +379,20 @@ class QuantizationAwareModule(nn.Module):
         self.set_functions()
 
     def set_functions(self):
+        """Set functions to be used wrt the model parameters"""
         if self.adjust_output_shift.detach():
-            self.calc_out_shift = OutputShift()
-            self.scale = Scaler(False)
-            self.calc_weight_scale = WeightScale()
+            self.calc_out_shift = OutputShift()  #pylint: disable=attribute-defined-outside-init
+            self.scale = Scaler(False)  #pylint: disable=attribute-defined-outside-init
+            self.calc_weight_scale = WeightScale()  #pylint: disable=attribute-defined-outside-init
         else:
-            self.calc_out_shift = OutputShiftSqueeze()
-            self.scale = Scaler(True)
-            self.calc_weight_scale = One()
-        self.calc_out_scale = OutputScale()
+            self.calc_out_shift = OutputShiftSqueeze()  #pylint: disable=attribute-defined-outside-init
+            self.scale = Scaler(True)  #pylint: disable=attribute-defined-outside-init
+            self.calc_weight_scale = One()  #pylint: disable=attribute-defined-outside-init
+        self.calc_out_scale = OutputScale()  #pylint: disable=attribute-defined-outside-init
 
-        self.quantize_weight, self.clamp_weight = quantize_clamp_parameters(self.weight_bits.detach().item())
-        self.quantize_bias, self.clamp_bias = quantize_clamp_parameters(self.bias_bits.detach().item())
-        self.quantize, self.clamp = quantize_clamp(self.wide, self.quantize_activation.detach().item())
+        self.quantize_weight, self.clamp_weight = quantize_clamp_parameters(self.weight_bits.detach().item())  # pylint: disable=line-too-long, attribute-defined-outside-init
+        self.quantize_bias, self.clamp_bias = quantize_clamp_parameters(self.bias_bits.detach().item())  # pylint: disable=line-too-long, attribute-defined-outside-init
+        self.quantize, self.clamp = quantize_clamp(self.wide, self.quantize_activation.detach().item())  # pylint: disable=line-too-long, attribute-defined-outside-init
 
     def forward(self, x):  # pylint: disable=arguments-differ
         if self.pool is not None:
