@@ -244,7 +244,7 @@ def quantize_clamp_parameters(bits):
     """
     Return new Quantization and Clamp objects for parameter
     """
-    if dev.simulate or (bits == 0):
+    if dev.simulate or bits == 0:
         clamp = Empty()
         if bits != 0:
             quantize = Quantize(num_bits=bits-dev.DATA_BITS+1)
@@ -361,12 +361,12 @@ class QuantizationAwareModule(nn.Module):
 
     def init_module(self, weight_bits, bias_bits, quantize_activation):
         """Initialize model parameters"""
-        if (weight_bits is None) and (bias_bits is None) and (not quantize_activation):
+        if weight_bits is None and bias_bits is None and not quantize_activation:
             self.weight_bits = nn.Parameter(torch.Tensor([0]), requires_grad=False)
             self.bias_bits = nn.Parameter(torch.Tensor([0]), requires_grad=False)
             self.quantize_activation = nn.Parameter(torch.Tensor([False]), requires_grad=False)
             self.adjust_output_shift = nn.Parameter(torch.Tensor([False]), requires_grad=False)
-        elif (weight_bits in [1, 2, 4, 8]) and (bias_bits == 8) and quantize_activation:
+        elif weight_bits in [1, 2, 4, 8] and bias_bits == 8 and quantize_activation:
             self.weight_bits = nn.Parameter(torch.Tensor([weight_bits]), requires_grad=False)
             self.bias_bits = nn.Parameter(torch.Tensor([bias_bits]), requires_grad=False)
             self.quantize_activation = nn.Parameter(torch.Tensor([True]), requires_grad=False)
