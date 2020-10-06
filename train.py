@@ -500,7 +500,7 @@ def create_model(supported_models, dimensions, args):
 
     # Set model paramaters
     if args.act_mode_8bit:
-        weight_bits = 8#args.qat_num_bits
+        weight_bits = 8
         bias_bits = 8
         quantize_activation = True
     else:
