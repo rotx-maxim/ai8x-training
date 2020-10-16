@@ -12,6 +12,7 @@ Parses yaml file used to define Quantization Aware Training
 
 import yaml
 
+
 def parse(yaml_file):
     """Parses yaml file
     """
