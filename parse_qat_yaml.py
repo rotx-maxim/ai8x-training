@@ -7,14 +7,15 @@
 #
 ###################################################################################################
 """
-Parses yaml file used to define Quantization Aware Training
+Parses YAML file used to define Quantization Aware Training
 """
 
 import yaml
 
 
 def parse(yaml_file):
-    """Parses yaml file
+    """
+    Parses `yaml_file` that defines the QAT policy
     """
     policy = None
     with open(yaml_file, 'r') as stream:
