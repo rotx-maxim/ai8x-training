@@ -77,7 +77,8 @@ def get_parser(model_names, dataset_names):
 
     qat_args = parser.add_argument_group('Quantization Arguments')
     qat_args.add_argument('--qat-policy', dest='qat_policy', default=None,
-                          help='path to yaml file to define quantization policy')
+                          help='path to YAML file that defines the '
+                               'QAT (quantization-aware training) policy')
 
     optimizer_args = parser.add_argument_group('Optimizer Arguments')
     optimizer_args.add_argument('--optimizer', default='SGD',
