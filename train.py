@@ -276,19 +276,17 @@ def main():
         tflogger = None
         all_tbloggers = []
 
-    # capture thresholds for early-exit training
+    # Capture thresholds for early-exit training
     if args.earlyexit_thresholds:
         msglogger.info('=> using early-exit threshold values of %s', args.earlyexit_thresholds)
 
-    # get policy for quantization aware training
-    qat_policy = None
-    if args.qat_policy:
-        qat_policy = parse_qat_yaml.parse(args.qat_policy)
+    # Get policy for quantization aware training
+    qat_policy = parse_qat_yaml.parse(args.qat_policy) if args.qat_policy else None
 
     # We can optionally resume from a checkpoint
     optimizer = None
     if args.resumed_checkpoint_path:
-        if qat_policy:
+        if qat_policy is not None:
             checkpoint = torch.load(args.resumed_checkpoint_path,
                                     map_location=lambda storage, loc: storage)
             if checkpoint.get('epoch', None) >= qat_policy['start_epoch']:
@@ -297,7 +295,7 @@ def main():
             model, args.resumed_checkpoint_path, model_device=args.device)
         ai8x.update_model(model)
     elif args.load_model_path:
-        if qat_policy:
+        if qat_policy is not None:
             checkpoint = torch.load(args.load_model_path,
                                     map_location=lambda storage, loc: storage)
             if checkpoint.get('epoch', None) >= qat_policy['start_epoch']:
@@ -425,7 +423,7 @@ def main():
 
     vloss = 10**6
     for epoch in range(start_epoch, ending_epoch):
-        if qat_policy and epoch > 0 and epoch == qat_policy['start_epoch']:
+        if qat_policy is not None and epoch > 0 and epoch == qat_policy['start_epoch']:
             # Fuse the BN parameters into conv layers before Quantization Aware Training (QAT)
             ai8x.fuse_bn_layers(model)
 
