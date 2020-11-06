@@ -65,7 +65,6 @@ import os
 import sys
 import traceback
 import logging
-from ast import literal_eval
 from collections import OrderedDict
 from functools import partial
 from pydoc import locate
@@ -282,7 +281,7 @@ def main():
         msglogger.info('=> using early-exit threshold values of %s', args.earlyexit_thresholds)
 
     # Get policy for quantization aware training
-    qat_policy = parse_qat_yaml.parse(args.qat_policy) if literal_eval(args.qat_policy) else None
+    qat_policy = parse_qat_yaml.parse(args.qat_policy) if args.qat_policy != str(None) else None
 
     # We can optionally resume from a checkpoint
     optimizer = None
